@@ -1,15 +1,18 @@
 
 package Logica;
 
+import Pantalla.Login;
 import java.util.Scanner;
 
 
 public class Main {
     
     public static void main(String[] args) {
-        activarMenu();
-        //Materia mate = new Materia();
-        //mate.consultarMateria();
+        Login lg = new Login();
+        lg.setVisible(true);
+        
+        
+ 
 
     }
     
