@@ -8,8 +8,10 @@ import java.util.Scanner;
 public class Main {
     
     public static void main(String[] args) {
-        Login lg = new Login();
-        lg.setVisible(true);
+        Conection con = new Conection();
+ 
+        
+        
         
         
  

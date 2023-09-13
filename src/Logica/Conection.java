@@ -1,5 +1,7 @@
 package Logica;
 
+import Pantalla.Inicio;
+import Pantalla.Login;
 import java.sql.ResultSet;
 import java.sql.PreparedStatement;
 import java.sql.Connection;
@@ -38,11 +40,13 @@ public class Conection {
     }
 
     public void validarLogin(String user, String pass) {
-        Conection conexion = new Conection();
+        Inicio in = new Inicio();
+        Login lg = new Login();
+        
 
         try {
             String sql = "SELECT * FROM `usuarios` WHERE `usuario`= ?";
-            PreparedStatement st = conexion.conectar().prepareStatement(sql);
+            PreparedStatement st = conectar().prepareStatement(sql);
             st.setString(1, user);
             ResultSet rs = st.executeQuery();
 
@@ -50,6 +54,8 @@ public class Conection {
                 String p = rs.getString("contraseña");
                 if (pass.equals(p)) {
                     JOptionPane.showMessageDialog(null, "Correcto!");
+                    
+                    in.setVisible(true);
                     rs.close();
                     st.close();
                 } else {
