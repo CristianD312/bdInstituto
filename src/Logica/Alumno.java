@@ -1,14 +1,19 @@
-
-package Logica;
+ package Logica;
 
 import java.sql.PreparedStatement;
 import java.sql.Statement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.Scanner;
-
+import javax.swing.JOptionPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
 
 public class Alumno {
-    
+
     private String nombre;
     private String apellido;
     private String direccion;
@@ -75,86 +80,97 @@ public class Alumno {
     public void setDni(String dni) {
         this.dni = dni;
     }
-    
-    public void crearAlumno (Alumno alumno){
-            Conection conexion = new Conection();
-            conexion.conectar();
-            try {
-            String sql = "INSERT INTO `alumnos`(`ID_Alumno`, `nombre`, `apellido`,`Dirección`,`Telefono`,`E-Mail`, `Dni`) VALUES (NULL, ?, ?, ?, ?, ?, ? );";
-            PreparedStatement statement = conexion.conn.prepareStatement(sql);
-            statement.setString(1, alumno.getNombre());
-            statement.setString(2, alumno.getApellido());
-            statement.setString(3, alumno.getDireccion());
-            statement.setString(4, alumno.getTelefono());
-            statement.setString(5, alumno.getMail());
-            statement.setString(6, alumno.getDni());
-            statement.executeUpdate();
-            System.out.println("alumno creado exitosamente");
-            statement.close();
+
+    public void crearAlumno(JTextField paramNombre, JTextField paramApellido, JTextField paramTel) {
+        Conection con = new Conection();
+        Alumno alu = new Alumno();
+        alu.setNombre(paramNombre.getText());
+        alu.setApellido(paramApellido.getText());
+        alu.setTelefono(paramTel.getText());
+        try {
+            String sql="";
+            sql = "INSERT INTO `alumnos` (`ID_Alumno`, `nombre`, `apellido`, `telefono`) VALUES (NULL, ?, ?, ?)";
+            PreparedStatement st =con.conectar().prepareCall(sql);
+            st.setString(1, alu.getNombre());
+            st.setString(2, alu.getApellido());
+            st.setString(3, alu.getTelefono());
+            st.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Alumno creado exitosamente.");
+            st.close();
             
-                
         } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Error, no se pudo realizar la operacion, error: "+e.toString());
         }
-    
+        
+        
+        
+        
+
     }
-    public void consultarAlumno(){
-            Conection conexion = new Conection();
-            conexion.conectar();
-            try {
-            String sql = "SELECT * FROM alumnos";
-            Statement statement = conexion.getConn().createStatement();
-            ResultSet resultSet = statement.executeQuery(sql);
-            
-            while (resultSet.next()){
-                System.out.println("El id del alumno es :"+resultSet.getInt("ID_Alumno"));
-                System.out.println("Nombre y Apellido: "+resultSet.getString("nombre")+" "+resultSet.getString("apellido"));
-                System.out.println("Dirección : "+resultSet.getString("Dirección"));
-                System.out.println("Telefono: "+resultSet.getString("Telefono"));
+
+    public void consultarAlumno(JTable paramtablaAlumno) {
+        Conection con = new Conection();
+        DefaultTableModel modelo = new DefaultTableModel();
+        TableRowSorter<TableModel> ordenarTabla = new TableRowSorter<>(modelo);
+        paramtablaAlumno.setRowSorter(ordenarTabla);
+        String sql = "select * from alumnos";
+        modelo.addColumn("id");
+        modelo.addColumn("Nombre");
+        modelo.addColumn("Apellido");
+        modelo.addColumn("Telefono");
+        String[] datos = new String[4];
+
+        try {
+            Statement st = con.conectar().createStatement();
+            ResultSet rs = st.executeQuery(sql);
+
+            while (rs.next()) {
+                datos[0] = rs.getString(1);
+                datos[1] = rs.getString(2);
+                datos[2] = rs.getString(3);
+                datos[3] = rs.getString(5);
+                modelo.addRow(datos);
+
             }
-            resultSet.close();
-            statement.close();
-            
-                
+            paramtablaAlumno.setModel(modelo);
+
         } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "no se pudo realizar la operacion, error: "+e.toString());
         }
-    
-    
+
     }
-    
-    public void modificarAlumno(){
+
+    public void modificarAlumno() {
         Conection conexion = new Conection();
         conexion.conectar();
         Scanner leer = new Scanner(System.in);
         try {
             System.out.println("Ingrese el ID del alumno");
-            int id= leer.nextInt();leer.nextLine();
+            int id = leer.nextInt();
+            leer.nextLine();
             System.out.println("Ingresa el Telefono del alumno");
             String telefono = leer.nextLine();
             System.out.println("Ingresa el E-mail del alumno");
             String mail = leer.nextLine();
-            
+
             //String sql = "SELECT * FROM `usuarios` WHERE `usuario`=`"+user+"` ";
-            String sql= "UPDATE `alumnos` SET `Telefono` = '"+telefono+"',`E-Mail` ='"+mail+"'  WHERE `ID_Alumno` = '"+id+"' ";
-            
+            String sql = "UPDATE `alumnos` SET `Telefono` = '" + telefono + "',`E-Mail` ='" + mail + "'  WHERE `ID_Alumno` = '" + id + "' ";
+
             PreparedStatement statement = conexion.conn.prepareStatement(sql);
             /*
             statement.setString(1, telefono);
             statement.setString(2, mail);
-            */
+             */
             //statement.setInt(1, id);
-            
+
             statement.executeUpdate();
             System.out.println("alumno modificado exitosamente");
             statement.close();
-            
-            
-            
+
         } catch (Exception e) {
-            System.out.println("no se pudo modificar, error: "+e.toString());
+            System.out.println("no se pudo modificar, error: " + e.toString());
         }
-        
-    
-    
+
     }
-    
+
 }
